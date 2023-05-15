@@ -1,0 +1,19 @@
+{
+  "name": "mdev1004-m2023-ice2",
+  "version": "0.0.2",
+  "description": "This is a demo project for MDEV1004 - ICE 2 - in the Summer 2023 semester at Georgian",
+  "author": "Tom Tsiliopoulos",
+  
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "morgan": "~1.9.1"
+  },
+  "main": "server.js",
+  "license": "MIT",
+  "private": true
+}
