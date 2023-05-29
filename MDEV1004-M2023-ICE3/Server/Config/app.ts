@@ -7,7 +7,7 @@ import logger from 'morgan';
 import mongoose from 'mongoose';
 import db from './db';
 
-mongoose.connect(db.localURI);
+mongoose.connect(db.remoteURI);
 
 // DB Connection Events
 mongoose.connection.on('connected', () =>{
