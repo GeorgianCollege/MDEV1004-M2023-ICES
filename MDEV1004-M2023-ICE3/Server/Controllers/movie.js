@@ -6,13 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DisplayMovieList = void 0;
 const movie_1 = __importDefault(require("../Models/movie"));
 function DisplayMovieList(req, res, next) {
-    movie_1.default.find({})
-        .then(function (data) {
-        res.json(data);
-    })
-        .catch(function (err) {
+    try {
+        let query = movie_1.default.find({}).exec();
+        query.then(function (data) {
+            res.json(data);
+        });
+    }
+    catch (err) {
         console.error(err);
-    });
+    }
 }
 exports.DisplayMovieList = DisplayMovieList;
 //# sourceMappingURL=movie.js.map
