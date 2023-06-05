@@ -15,5 +15,8 @@ router.get('/find/:id', function (req, res, next) {
 router.post('/add', function (req, res, next) {
     (0, movie_1.AddMovie)(req, res, next);
 });
+router.post('/update/:id', function (req, res, next) {
+    (0, movie_1.UpdateMovie)(req, res, next);
+});
 exports.default = router;
 //# sourceMappingURL=index.js.map
