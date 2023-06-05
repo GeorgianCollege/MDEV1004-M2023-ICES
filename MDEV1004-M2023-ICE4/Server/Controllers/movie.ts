@@ -72,8 +72,6 @@ export function AddMovie(req: Request, res: Response, next: NextFunction): void
     {
         console.error(err);
     });
-
-    Movie.create()
 }
 
 export function UpdateMovie(req: Request, res: Response, next: NextFunction): void
@@ -109,6 +107,19 @@ export function UpdateMovie(req: Request, res: Response, next: NextFunction): vo
     {
         console.error(err);
     });
+}
 
-    Movie.create()
+export function DeleteMovie(req: Request, res: Response, next: NextFunction): void
+{
+    let id = req.params.id;
+
+    Movie.deleteOne({_id: id})
+    .then(function()
+    {
+        res.json(id);
+    })
+    .catch(function(err)
+    {
+        console.error(err);
+    });
 }
