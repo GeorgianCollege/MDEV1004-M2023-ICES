@@ -74,7 +74,7 @@ export function ProcessLogin(req:Request, res:Response, next:NextFunction): void
                 return next(err);
             }
             // if we had a front-end (like Angular or React or Mobile UI)...
-            return res.json({success: true, msg: 'User Logged in Successfully!', user: user});
+            return res.json({success: true, msg: 'User Logged in Successfully!'});
         });
     })(req, res, next);
 }

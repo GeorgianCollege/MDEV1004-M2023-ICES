@@ -2,7 +2,7 @@ import express from 'express';
 let router = express.Router();
 
 /* Get the movie Controller */
-import { DisplayMovieList, DisplayMovieByID, AddMovie, UpdateMovie, DeleteMovie  } from '../Controllers/movie';
+import { DisplayMovieList, DisplayMovieByID, AddMovie, UpdateMovie, DeleteMovie, ProcessRegistration, ProcessLogin, ProcessLogout  } from '../Controllers/movie';
 
 router.get('/list', function(req, res, next)
 {
@@ -27,6 +27,22 @@ router.put('/update/:id', function(req, res, next)
 router.delete('/delete/:id', function(req, res, next)
 {
   DeleteMovie(req, res, next);
+});
+
+// Authentication routes
+router.post('/register', function(req, res, next)
+{
+  ProcessRegistration(req, res, next);
+});
+
+router.post('/login', function(req, res, next)
+{
+  ProcessLogin(req, res, next);
+});
+
+router.get('/logout', function(req, res, next)
+{
+  ProcessLogout(req, res, next);
 });
 
 export default router;

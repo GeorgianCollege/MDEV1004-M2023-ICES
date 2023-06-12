@@ -48,7 +48,7 @@ function ProcessLogin(req, res, next) {
                 console.error(err);
                 return next(err);
             }
-            return res.json({ success: true, msg: 'User Logged in Successfully!', user: user });
+            return res.json({ success: true, msg: 'User Logged in Successfully!' });
         });
     })(req, res, next);
 }
