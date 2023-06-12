@@ -16,7 +16,8 @@ interface IMovie
     criticsRating: number
 }
 
-let movieSchema = new Schema<IMovie>({
+let movieSchema = new Schema<IMovie>
+({
     movieID: String,
     title: String,
     studio: String,

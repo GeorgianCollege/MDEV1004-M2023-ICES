@@ -1,7 +1,14 @@
+// modules for express server
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+
+// modules for authentication
+import session from 'express-session';
+import passport from 'passport';
+import passportLocal from 'passport-local';
+
 
 // Database modules
 import mongoose from 'mongoose';
