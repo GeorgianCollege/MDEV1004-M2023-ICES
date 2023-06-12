@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
+import passport from 'passport';
+
+import User from '../Models/user';
 
 import Movie from '../Models/movie';
 
+// Utility Function
 function SanitizeArray(unsanitizedArray: string[]): string[]
 {
     let sanitizedArray: string[] = Array<string>();
@@ -12,6 +16,41 @@ function SanitizeArray(unsanitizedArray: string[]): string[]
     return sanitizedArray;
 }
 
+/* Authentication Functions */
+
+export function ProcessRegistration(req:Request, res:Response, next:NextFunction): void
+{
+    // instantiate a new user object
+    let newUser = new User
+    ({
+        username: req.body.username,
+        emailAddress: req.body.EmailAddress,
+        displayName: req.body.FirstName + " " + req.body.LastName 
+    });
+
+    User.register(newUser, req.body.password, (err) => 
+    {
+        if(err){
+            console.error('Error: Inserting New User');
+            if(err.name == "UserExistsError")
+            {
+               console.error('Error: User Already Exists');
+            }
+            return res.json({success: false, msg: 'User not Registered Successfully!'});
+        }
+        // if we had a front-end (Angular, React or a Mobile UI)...
+        //return res.json({success: true, msg: 'User Registered Successfully!'});
+
+        // automatically login the user
+        return passport.authenticate('local')(req, res, ()=>
+        {
+            return res.json({success: true, msg: 'User Logged in Successfully!', user: newUser});
+        });
+    });
+}
+
+
+/* API Functions */
 export function DisplayMovieList(req: Request, res: Response, next: NextFunction): void
 {
     
