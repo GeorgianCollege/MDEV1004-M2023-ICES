@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteMovie = exports.UpdateMovie = exports.AddMovie = exports.DisplayMovieByID = exports.DisplayMovieList = exports.ProcessRegistration = void 0;
+exports.DeleteMovie = exports.UpdateMovie = exports.AddMovie = exports.DisplayMovieByID = exports.DisplayMovieList = exports.ProcessLogout = exports.ProcessLogin = exports.ProcessRegistration = void 0;
 const passport_1 = __importDefault(require("passport"));
 const user_1 = __importDefault(require("../Models/user"));
 const movie_1 = __importDefault(require("../Models/movie"));
@@ -34,6 +34,32 @@ function ProcessRegistration(req, res, next) {
     });
 }
 exports.ProcessRegistration = ProcessRegistration;
+function ProcessLogin(req, res, next) {
+    passport_1.default.authenticate('local', (err, user, info) => {
+        if (err) {
+            console.error(err);
+            return next(err);
+        }
+        if (!user) {
+            return res.json({ success: false, msg: 'User Not Logged in Successfully!' });
+        }
+        req.login(user, (err) => {
+            if (err) {
+                console.error(err);
+                return next(err);
+            }
+            return res.json({ success: true, msg: 'User Logged in Successfully!', user: user });
+        });
+    })(req, res, next);
+}
+exports.ProcessLogin = ProcessLogin;
+function ProcessLogout(req, res, next) {
+    req.logout(() => {
+        console.log("User Logged Out");
+    });
+    res.json({ success: true, msg: 'User Logged out Successfully!' });
+}
+exports.ProcessLogout = ProcessLogout;
 function DisplayMovieList(req, res, next) {
     movie_1.default.find({})
         .then(function (data) {
