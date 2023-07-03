@@ -7,9 +7,18 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Schema = mongoose_1.default.Schema;
 const passport_local_mongoose_1 = __importDefault(require("passport-local-mongoose"));
 const UserSchema = new Schema({
-    username: String,
-    emailAddress: String,
-    displayName: String,
+    username: {
+        type: String,
+        required: true
+    },
+    emailAddress: {
+        type: String,
+        required: true
+    },
+    displayName: {
+        type: String,
+        required: true
+    },
     created: {
         type: Date,
         default: Date.now()

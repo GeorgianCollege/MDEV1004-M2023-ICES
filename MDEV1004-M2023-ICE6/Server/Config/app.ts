@@ -53,7 +53,7 @@ app.use(passport.session());
 passport.use(User.createStrategy());
 
 // serialize and deserialize user data
-passport.serializeUser(User.serializeUser());
+passport.serializeUser(User.serializeUser() as any);
 passport.deserializeUser(User.deserializeUser());
 
 app.use('/api/', indexRouter);

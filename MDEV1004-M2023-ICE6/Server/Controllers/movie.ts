@@ -1,17 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
+import mongoose from 'mongoose';
 
 import User from '../Models/user';
 
 import Movie from '../Models/movie';
 
 // Utility Function
-function SanitizeArray(unsanitizedArray: string[]): string[]
+function SanitizeArray(unsanitizedString: string): string[]
 {
-    let sanitizedArray: string[] = Array<string>();
-    for (const unsatizedString of unsanitizedArray) 
+    if(unsanitizedString == null || unsanitizedString == undefined)
     {
-        sanitizedArray.push(unsatizedString.trim());
+        return Array<string>();
+    }
+
+    let unsanitizedArray: string[] = unsanitizedString.split(',');
+
+    let sanitizedArray: string[] = Array<string>();
+    for (const unsanitizedString of unsanitizedArray) 
+    {
+        sanitizedArray.push(unsanitizedString.trim());
     }
     return sanitizedArray;
 }
@@ -30,6 +38,13 @@ export function ProcessRegistration(req:Request, res:Response, next:NextFunction
 
     User.register(newUser, req.body.password, (err) => 
     {
+        if(err instanceof mongoose.Error.ValidationError)
+        {
+            console.error('All Fields Are Required');
+            return res.json({success: false, msg: 'ERROR: User Not Registered. All Fields Are Required'});
+        }
+
+
         if(err){
             console.error('Error: Inserting New User');
             if(err.name == "UserExistsError")
@@ -62,7 +77,7 @@ export function ProcessLogin(req:Request, res:Response, next:NextFunction): void
         // are the login errors?
         if(!user)
         {
-			return res.json({success: false, msg: 'User Not Logged in Successfully!'});
+			return res.json({success: false, msg: 'ERROR: User Not Logged in.'});
         }
 
         req.login(user, (err) => 
@@ -94,112 +109,169 @@ export function ProcessLogout(req:Request, res:Response, next:NextFunction): voi
 /* API Functions */
 export function DisplayMovieList(req: Request, res: Response, next: NextFunction): void
 {
-    
     Movie.find({})
     .then(function(data)
     {
-        res.status(200).json(data);
+        res.status(200).json({success: true, msg: "Movie List Displayed Successfully", data: data});
     })
     .catch(function(err)
     {
         console.error(err);
+        res.status(500).json({success: false, msg: "ERROR: Something Went Wrong", data: null});
     });
 }
 
 export function DisplayMovieByID(req: Request, res: Response, next: NextFunction): void
 {
-    let id = req.params.id;
-    Movie.findById({_id: id})
-    .then(function(data)
+    try
     {
-        res.status(200).json(data)
-    })
-    .catch(function(err)
+        let id = req.params.id;
+        Movie.findById({_id: id})
+        .then(function(data)
+        {
+            if(data)
+            {
+                res.status(200).json({success: true, msg: "Movie Retrieved by ID Successfully", data: data});
+            }
+            else
+            {
+                res.status(404).json({success: false, msg: "Movie ID Not Found", data: data});
+            }
+            
+        })
+        .catch(function(err)
+        {
+            console.error(err);
+            res.status(400).json({success: false, msg: "ERROR: Movie ID not formatted correctly", data: null});
+        });
+    }
+    catch(err)
     {
         console.error(err);
-    });
+        res.status(500).json({success: false, msg: "ERROR: Something Went Wrong", data: null});
+    }
 }
 
 export function AddMovie(req: Request, res: Response, next: NextFunction): void
 {
-
-    let genres = SanitizeArray((req.body.genres as string).split(","));
-    let directors = SanitizeArray((req.body.directors as string).split(","));
-    let writers = SanitizeArray((req.body.writers as string).split(","));
-    let actors = SanitizeArray((req.body.actors as string).split(","));
-
-    let movie = new Movie({
-       movieID: req.body.movieID,
-       title: req.body.title,
-       studio: req.body.studio,
-       genres: genres,
-       directors: directors,
-       writers: writers,
-       actors: actors,
-       length: req.body.length,
-       year: req.body.year,
-       shortDescription: req.body.shortDescription,
-       mpaRating: req.body.mpaRating,
-       criticsRating: req.body.criticsRating
-    });
-
-    Movie.create(movie)
-    .then(function()
+    try
     {
-        res.json(movie);
-    })
-    .catch(function(err)
+        let genres = SanitizeArray(req.body.genres as string);
+        let directors = SanitizeArray(req.body.directors as string);
+        let writers = SanitizeArray(req.body.writers as string);
+        let actors = SanitizeArray(req.body.actors as string);
+    
+        let movie = new Movie({
+           movieID: req.body.movieID,
+           title: req.body.title,
+           studio: req.body.studio,
+           genres: genres,
+           directors: directors,
+           writers: writers,
+           actors: actors,
+           length: req.body.length,
+           year: req.body.year,
+           shortDescription: req.body.shortDescription,
+           mpaRating: req.body.mpaRating,
+           criticsRating: req.body.criticsRating
+        });
+    
+        Movie.create(movie)
+        .then(function()
+        {
+            res.status(200).json({success: true, msg: "Movie Added Successfully", data:movie});
+        })
+        .catch(function(err)
+        {
+            console.error(err);
+            if(err instanceof mongoose.Error.ValidationError)
+            {
+                res.status(400).json({success: false, msg: "ERROR: Movie Not Added. All Fields are required", data:null});
+            }
+            else
+            {
+                res.status(400).json({success: false, msg: "ERROR: Movie Not Added.", data:null});
+            }
+        });
+    }
+    catch(err)
     {
         console.error(err);
-    });
+        res.status(500).json({success: false, msg: "Something Went Wrong", data: null});
+    }
 }
 
 export function UpdateMovie(req: Request, res: Response, next: NextFunction): void
 {
-    let id = req.params.id;
-    let genres = SanitizeArray((req.body.genres as string).split(","));
-    let directors = SanitizeArray((req.body.directors as string).split(","));
-    let writers = SanitizeArray((req.body.writers as string).split(","));
-    let actors = SanitizeArray((req.body.actors as string).split(","));
-
-    let movieToUpdate = new Movie({
-       _id: id,
-       movieID: req.body.movieID,
-       title: req.body.title,
-       studio: req.body.studio,
-       genres: genres,
-       directors: directors,
-       writers: writers,
-       actors: actors,
-       length: req.body.length,
-       year: req.body.year,
-       shortDescription: req.body.shortDescription,
-       mpaRating: req.body.mpaRating,
-       criticsRating: req.body.criticsRating
-    });
-
-    Movie.updateOne({_id: id}, movieToUpdate)
-    .then(function()
+    try
     {
-        res.json(movieToUpdate);
-    })
-    .catch(function(err)
+        let id = req.params.id;
+        let genres = SanitizeArray(req.body.genres as string);
+        let directors = SanitizeArray(req.body.directors as string);
+        let writers = SanitizeArray(req.body.writers as string);
+        let actors = SanitizeArray(req.body.actors as string);
+    
+        let movieToUpdate = new Movie({
+           _id: id,
+           movieID: req.body.movieID,
+           title: req.body.title,
+           studio: req.body.studio,
+           genres: genres,
+           directors: directors,
+           writers: writers,
+           actors: actors,
+           length: req.body.length,
+           year: req.body.year,
+           shortDescription: req.body.shortDescription,
+           mpaRating: req.body.mpaRating,
+           criticsRating: req.body.criticsRating
+        });
+    
+        Movie.updateOne({_id: id}, movieToUpdate)
+        .then(function()
+        {
+            res.status(200).json({success: true, msg: "Movie Updated Successfully", data:movieToUpdate});
+        })
+        .catch(function(err)
+        {
+            console.error(err);
+            if(err instanceof mongoose.Error.ValidationError)
+            {
+                res.status(400).json({success: false, msg: "ERROR: Movie Not Updated. All Fields are required", data:null});
+            }
+            else
+            {
+                res.status(400).json({success: false, msg: "ERROR: Movie Not Updated.", data:null});
+            }
+        });
+    }
+    catch(err)
     {
         console.error(err);
-    });
+        res.status(500).json({success: false, msg: "Something Went Wrong", data: null});
+    }
 }
 
 export function DeleteMovie(req: Request, res: Response, next: NextFunction): void
 {
-    let id = req.params.id;
-
-    Movie.deleteOne({_id: id})
-    .then(function()
+    try
     {
-        res.json(id);
-    })
-    .catch(function(err)
+        let id = req.params.id;
+
+        Movie.deleteOne({_id: id})
+        .then(function()
+        {
+            res.status(200).json({success: true, msg: "Movie Deleted Successfully", data:id});
+        })
+        .catch(function(err)
+        {
+            console.error(err);
+            res.status(400).json({success: false, msg: "ERROR: Movie ID not formatted correctly", data: null});
+        });
+    }
+    catch(err)
     {
         console.error(err);
-    });
+        res.status(500).json({success: false, msg: "ERROR: Something Went Wrong", data: null});
+    }
 }
