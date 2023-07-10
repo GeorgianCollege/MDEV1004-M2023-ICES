@@ -9,11 +9,14 @@ const morgan_1 = __importDefault(require("morgan"));
 const express_session_1 = __importDefault(require("express-session"));
 const passport_1 = __importDefault(require("passport"));
 const passport_local_1 = __importDefault(require("passport-local"));
+const passport_jwt_1 = __importDefault(require("passport-jwt"));
+let JWTStrategy = passport_jwt_1.default.Strategy;
+let ExtractJWT = passport_jwt_1.default.ExtractJwt;
 let strategy = passport_local_1.default.Strategy;
 const user_1 = __importDefault(require("../Models/user"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const db_1 = __importDefault(require("./db"));
-mongoose_1.default.connect(db_1.default.localURI);
+mongoose_1.default.connect(db_1.default.remoteURI);
 mongoose_1.default.connection.on('connected', () => {
     console.log(`Connected to MongoDB`);
 });
