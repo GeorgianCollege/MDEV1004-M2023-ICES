@@ -1,7 +1,7 @@
 {
-  "name": "mdev1004-m2023-ice6",
+  "name": "mdev1004-m2023-ice7",
   "version": "0.0.3",
-  "description": "This is a demo project for MDEV1004 - ICE 6 - in the Summer 2023 semester at Georgian",
+  "description": "This is a demo project for MDEV1004 - ICE 7 - in the Summer 2023 semester at Georgian",
   "author": "Tom Tsiliopoulos",
   "engines": {
     "node": "20.2.0",

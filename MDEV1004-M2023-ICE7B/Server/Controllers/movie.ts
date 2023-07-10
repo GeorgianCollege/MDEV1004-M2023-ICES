@@ -76,17 +76,25 @@ export function ProcessLogin(req:Request, res:Response, next:NextFunction): void
 			return res.json({success: false, msg: 'ERROR: User Not Logged in.'});
         }
 
-        req.login(user, (err) => 
+        req.logIn(user, (err) =>
         {
-            // are there DB errors?
+            // are there db errors?
             if(err)
             {
                 console.error(err);
-                return next(err);
+                res.end(err);
             }
-            // if we had a front-end (like Angular or React or Mobile UI)...
-            return res.json({success: true, msg: 'User Logged in Successfully!'});
+
+            const authToken = GenerateToken(user);
+
+            return res.json({success: true, msg: 'User Logged In Successfully!', user: {
+                id: user._id,
+                displayName: user.displayName,
+                username: user.username,
+                emailAddress: user.emailAddress
+            }, token: authToken});
         });
+        return;
     })(req, res, next);
 }
 

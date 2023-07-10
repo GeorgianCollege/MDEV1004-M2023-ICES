@@ -8,6 +8,7 @@ const passport_1 = __importDefault(require("passport"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_1 = __importDefault(require("../Models/user"));
 const movie_1 = __importDefault(require("../Models/movie"));
+const index_1 = require("../Util/index");
 function SanitizeArray(unsanitizedString) {
     if (unsanitizedString == null || unsanitizedString == undefined) {
         return Array();
@@ -50,13 +51,20 @@ function ProcessLogin(req, res, next) {
         if (!user) {
             return res.json({ success: false, msg: 'ERROR: User Not Logged in.' });
         }
-        req.login(user, (err) => {
+        req.logIn(user, (err) => {
             if (err) {
                 console.error(err);
-                return next(err);
+                res.end(err);
             }
-            return res.json({ success: true, msg: 'User Logged in Successfully!' });
+            const authToken = (0, index_1.GenerateToken)(user);
+            return res.json({ success: true, msg: 'User Logged In Successfully!', user: {
+                    id: user._id,
+                    displayName: user.displayName,
+                    username: user.username,
+                    emailAddress: user.emailAddress
+                }, token: authToken });
         });
+        return;
     })(req, res, next);
 }
 exports.ProcessLogin = ProcessLogin;
