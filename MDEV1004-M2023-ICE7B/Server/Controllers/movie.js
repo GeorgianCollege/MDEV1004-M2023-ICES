@@ -9,16 +9,16 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const user_1 = __importDefault(require("../Models/user"));
 const movie_1 = __importDefault(require("../Models/movie"));
 const index_1 = require("../Util/index");
-function SanitizeArray(unsanitizedString) {
-    if (unsanitizedString == null || unsanitizedString == undefined) {
-        return Array();
+function SanitizeArray(unsanitizedValue) {
+    if (Array.isArray(unsanitizedValue)) {
+        return unsanitizedValue.map((value) => value.trim());
     }
-    let unsanitizedArray = unsanitizedString.split(',');
-    let sanitizedArray = Array();
-    for (const unsanitizedString of unsanitizedArray) {
-        sanitizedArray.push(unsanitizedString.trim());
+    else if (typeof unsanitizedValue === "string") {
+        return unsanitizedValue.split(",").map((value) => value.trim());
     }
-    return sanitizedArray;
+    else {
+        return [];
+    }
 }
 function ProcessRegistration(req, res, next) {
     let newUser = new user_1.default({
