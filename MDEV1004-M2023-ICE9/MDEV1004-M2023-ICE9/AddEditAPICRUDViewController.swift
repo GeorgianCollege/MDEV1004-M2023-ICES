@@ -61,12 +61,14 @@ class AddEditAPICRUDViewController: UIViewController
     
     @IBAction func UpdateButton_Pressed(_ sender: UIButton)
     {
+        // Retrieve AuthToken
         guard let authToken = UserDefaults.standard.string(forKey: "AuthToken") else
         {
             print("AuthToken not available.")
             return
         }
         
+        // Configure Request
         let urlString: String
         let requestType: String
         
@@ -121,6 +123,7 @@ class AddEditAPICRUDViewController: UIViewController
         // Add the AuthToken to the request headers
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         
+        // Request
         do {
             request.httpBody = try JSONEncoder().encode(movie)
         } catch {
@@ -128,6 +131,7 @@ class AddEditAPICRUDViewController: UIViewController
             return
         }
         
+        // Response
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             if let error = error
             {

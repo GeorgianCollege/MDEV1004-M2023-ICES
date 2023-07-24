@@ -46,6 +46,7 @@ class APICRUDViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func fetchMovies(completion: @escaping ([Movie]?, Error?) -> Void)
     {
+        // Retrieve AuthToken from UserDefaults
         guard let authToken = UserDefaults.standard.string(forKey: "AuthToken") else
         {
             print("AuthToken not available.")
@@ -53,6 +54,7 @@ class APICRUDViewController: UIViewController, UITableViewDelegate, UITableViewD
             return
         }
         
+        // Configure Request
         guard let url = URL(string: "https://mdev1004-m2023-livesite.onrender.com/api/list") else
         {
             print("URL Error")
@@ -64,6 +66,7 @@ class APICRUDViewController: UIViewController, UITableViewDelegate, UITableViewD
             request.httpMethod = "GET"
             request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
+        // Issue Request
         URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
                 print("Network Error")
@@ -77,6 +80,7 @@ class APICRUDViewController: UIViewController, UITableViewDelegate, UITableViewD
                 return
             }
 
+            // Response
             do {
                 print("Decoding JSON Data...")
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]

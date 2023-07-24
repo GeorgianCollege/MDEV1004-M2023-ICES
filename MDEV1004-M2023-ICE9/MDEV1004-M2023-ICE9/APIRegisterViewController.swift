@@ -34,6 +34,8 @@ class APIRegisterViewController: UIViewController
             print("Invalid URL.")
             return
         }
+        
+        // Configure Request
                 
         let parameters = [
             "username": username,
@@ -54,6 +56,8 @@ class APIRegisterViewController: UIViewController
             return
         }
         
+        // Issue the Request
+        
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error
             {
@@ -67,6 +71,7 @@ class APIRegisterViewController: UIViewController
                 return
             }
             
+            // Response
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 

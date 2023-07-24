@@ -36,11 +36,12 @@ class APILoginViewController: UIViewController
             return
         }
                 
+        // Configure the Request
         let parameters = ["username": username, "password": password]
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                
+          
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
@@ -48,6 +49,7 @@ class APILoginViewController: UIViewController
             return
         }
                 
+        // Issue the Request to the API
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             if let error = error
             {
@@ -61,6 +63,7 @@ class APILoginViewController: UIViewController
                 return
             }
             
+            // API Response
             do {
                 let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 
