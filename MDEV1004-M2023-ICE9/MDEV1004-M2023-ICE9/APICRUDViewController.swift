@@ -1,6 +1,6 @@
 import UIKit
 
-class CRUDViewController: UIViewController, UITableViewDelegate, UITableViewDataSource
+class APICRUDViewController: UIViewController, UITableViewDelegate, UITableViewDataSource
 {
     @IBOutlet weak var tableView: UITableView!
         
@@ -46,14 +46,25 @@ class CRUDViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func fetchMovies(completion: @escaping ([Movie]?, Error?) -> Void)
     {
+        guard let authToken = UserDefaults.standard.string(forKey: "AuthToken") else
+        {
+            print("AuthToken not available.")
+            completion(nil, nil)
+            return
+        }
+        
         guard let url = URL(string: "https://mdev1004-m2023-livesite.onrender.com/api/list") else
         {
             print("URL Error")
             completion(nil, nil) // Handle URL error
             return
         }
+        
+        var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
-        URLSession.shared.dataTask(with: url) { data, _, error in
+        URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
                 print("Network Error")
                 completion(nil, error) // Handle network error
@@ -158,7 +169,7 @@ class CRUDViewController: UIViewController, UITableViewDelegate, UITableViewData
     {
         if segue.identifier == "AddEditSegue"
         {
-            if let addEditVC = segue.destination as? AddEditCRUDViewController
+            if let addEditVC = segue.destination as? AddEditAPICRUDViewController
             {
                 addEditVC.crudViewController = self
                 if let indexPath = sender as? IndexPath
@@ -209,6 +220,13 @@ class CRUDViewController: UIViewController, UITableViewDelegate, UITableViewData
     func deleteMovie(at indexPath: IndexPath)
     {
         let movie = movies[indexPath.row]
+        
+        // New for ICE9
+        guard let authToken = UserDefaults.standard.string(forKey: "AuthToken") else
+        {
+                    print("AuthToken not available.")
+                    return
+        }
 
         guard let url = URL(string: "https://mdev1004-m2023-livesite.onrender.com/api/delete/\(movie._id)") else {
             print("Invalid URL")
@@ -217,6 +235,8 @@ class CRUDViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
+        // New for ICE9
+        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             if let error = error {
@@ -231,6 +251,19 @@ class CRUDViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
             
         task.resume()
+    }
+    
+    // New for ICE 9
+    @IBAction func logoutButtonPressed(_ sender: UIButton)
+    {
+        // Remove the token from UserDefaults or local storage to indicate logout
+        UserDefaults.standard.removeObject(forKey: "AuthToken")
+        
+        // Clear the username and password in the LoginViewController
+        APILoginViewController.shared?.ClearLoginTextFields()
+        
+        // unwind
+        performSegue(withIdentifier: "unwindToLogin", sender: self)
     }
 
 }
